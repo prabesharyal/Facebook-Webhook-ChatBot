@@ -21,6 +21,9 @@ const verifyWebhook = (req, res) => {
       res.sendStatus(403);
    }
 };
+app.get('/', (req, res) => {
+   res.status(200).send({ msg: 'ok bro !!' });
+});
 app.get('/verify', verifyWebhook);
 
 // Xử lý webhook
