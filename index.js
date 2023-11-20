@@ -21,6 +21,55 @@ const verifyWebhook = (req, res) => {
       res.sendStatus(403);
    }
 };
+function handlePostback(senderPsid, payload) {
+   if (payload === 'ORDER_INFO') {
+      // Gửi tin nhắn yêu cầu người dùng nhập thông tin đặt hàng
+      sendOrderInfoRequest(senderPsid);
+   }
+}
+function sendOrderInfoRequest(senderPsid) {
+   const requestBody = {
+      recipient: {
+         id: senderPsid,
+      },
+      message: {
+         attachment: {
+            type: 'template',
+            payload: {
+               template_type: 'generic',
+               elements: [
+                  {
+                     title: 'Nhập thông tin đặt hàng',
+                     subtitle: 'Vui lòng điền đầy đủ thông tin bên dưới:',
+                     buttons: [
+                        {
+                           type: 'web_url',
+                           url: 'http://delimall.senvangsolutions.com/Deligift',
+                           title: 'Điền thông tin',
+                        },
+                     ],
+                  },
+               ],
+            },
+         },
+      },
+   };
+   request(
+      {
+         uri: 'https://graph.facebook.com/v18.0/me/messages',
+         qs: { access_token: PAGE_ACCESS_TOKEN },
+         method: 'POST',
+         json: requestBody,
+      },
+      (error, response, body) => {
+         if (!error && response.statusCode === 200) {
+            console.log('Tin nhắn đã được gửi!');
+         } else {
+            console.error('Lỗi khi gửi tin nhắn:', error);
+         }
+      }
+   );
+}
 app.get('/', (req, res) => {
    res.status(200).send({ msg: 'ok bro !!' });
 });
@@ -36,11 +85,16 @@ app.post('/webhook', (req, res) => {
          const webhookEvent = entry.messaging[0];
          const senderPsid = webhookEvent.sender.id;
 
-         // Kiểm tra xem tin nhắn có chứa text "hello" hay không
-         if (
-            webhookEvent.message &&
-            webhookEvent.message.text &&
-            webhookEvent.message.text.toLowerCase() === 'hello'
+         // Kiểm tra nếu là postback event
+         if (webhookEvent.postback) {
+            const payload = webhookEvent.postback.payload;
+            handlePostback(senderPsid, payload);
+         } else if (
+            (webhookEvent.message &&
+               webhookEvent.message.text &&
+               webhookEvent.message.text.toLowerCase() === 'hello') ||
+            webhookEvent.message.text.toLowerCase() === 'mua' ||
+            webhookEvent.message.text.toLowerCase() === 'start'
          ) {
             sendResponse(senderPsid);
          }
@@ -65,19 +119,20 @@ function sendResponse(senderPsid) {
                template_type: 'generic',
                elements: [
                   {
-                     title: 'Sản phẩm',
-                     image_url: 'https://example.com/product.jpg',
-                     subtitle: 'Giá: $10',
+                     title: 'Bánh Bao Xíu Mại Trứng Muối 50g (300g) (300g) Bánh Bao Xíu Mại',
+                     image_url:
+                        'http://delimall.senvangsolutions.com/Assets/images/gift1.png',
+                     subtitle: 'Giá: 100,000đ',
                      buttons: [
                         {
                            type: 'web_url',
-                           url: 'https://example.com',
+                           url: 'http://delimall.senvangsolutions.com/Restaurant',
                            title: 'Mua hàng',
                         },
                         {
                            type: 'postback',
-                           title: 'Đã mua',
-                           payload: 'PURCHASED',
+                           title: 'Nhập thông tin đặt hàng',
+                           payload: 'ORDER_INFO',
                         },
                      ],
                   },
