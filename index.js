@@ -24,7 +24,7 @@ const verifyWebhook = (req, res) => {
 app.get('/', (req, res) => {
    res.status(200).send({ msg: 'ok bro !!' });
 });
-app.get('/verify', verifyWebhook);
+app.get('/webhook', verifyWebhook);
 
 // Xử lý webhook
 app.post('/webhook', (req, res) => {
@@ -89,7 +89,7 @@ function sendResponse(senderPsid) {
 
    request(
       {
-         uri: 'https://graph.facebook.com/v14.0/me/messages',
+         uri: 'https://graph.facebook.com/v18.0/me/messages',
          qs: { access_token: PAGE_ACCESS_TOKEN },
          method: 'POST',
          json: requestBody,
