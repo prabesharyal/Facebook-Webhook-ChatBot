@@ -10,7 +10,7 @@ const helloWebhook = (req, res) => {
    const resonseClient = {
       status: 'Webhook is running',
       author: 'KhangNguyen',
-      msg: 'Hello world',
+      msg: 'Hello bro!',
    };
    const jsonString = JSON.stringify(resonseClient);
    tg.sendMessage(jsonString, 'INFO');
@@ -30,7 +30,8 @@ const verifyWebhook = (req, res) => {
 
 const handleRequest = (req, res) => {
    const { body } = req;
-   tg.sendMessage(body, 'INFO');
+   const jsonString = JSON.stringify(body);
+   tg.sendMessage(jsonString, 'INFO');
    // Kiểm tra xem tin nhắn đến có phải là từ người dùng hay không
    if (body.object === 'page') {
       body.entry.forEach((entry) => {
