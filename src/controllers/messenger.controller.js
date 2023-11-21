@@ -59,7 +59,7 @@ const handleRequest = (req, res) => {
          res.sendStatus(404);
       }
    } catch (err) {
-      const jsonString = JSON.stringify({ err });
+      const jsonString = JSON.stringify({ err:err.message });
       tg.sendMessage(jsonString, 'ERROR');
       res.status(200).send('MESSAGE_ERROR');
    }
