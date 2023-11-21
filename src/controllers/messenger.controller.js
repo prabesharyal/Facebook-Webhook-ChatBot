@@ -29,33 +29,39 @@ const verifyWebhook = (req, res) => {
 };
 
 const handleRequest = (req, res) => {
-   const { body } = req;
-   const jsonString = JSON.stringify(body);
-   tg.sendMessage(jsonString, 'INFO');
-   // Kiểm tra xem tin nhắn đến có phải là từ người dùng hay không
-   if (body.object === 'page') {
-      body.entry.forEach((entry) => {
-         const webhookEvent = entry.messaging[0];
-         const senderPsid = webhookEvent.sender.id;
+   try {
+      const { body } = req;
+      const jsonString = JSON.stringify(body);
+      tg.sendMessage(jsonString, 'INFO');
+      // Kiểm tra xem tin nhắn đến có phải là từ người dùng hay không
+      if (body.object === 'page') {
+         body.entry.forEach((entry) => {
+            const webhookEvent = entry.messaging[0];
+            const senderPsid = webhookEvent.sender.id;
 
-         // Kiểm tra nếu là postback event
-         if (webhookEvent.postback) {
-            const payload = webhookEvent.postback.payload;
-            handlePostback(senderPsid, payload);
-         } else if (
-            (webhookEvent.message &&
-               webhookEvent.message.text &&
-               webhookEvent.message.text.toLowerCase() === 'hello') ||
-            webhookEvent.message.text.toLowerCase() === 'mua' ||
-            webhookEvent.message.text.toLowerCase() === 'start'
-         ) {
-            sendProductResponse(senderPsid);
-         }
-      });
+            // Kiểm tra nếu là postback event
+            if (webhookEvent.postback) {
+               const payload = webhookEvent.postback.payload;
+               handlePostback(senderPsid, payload);
+            } else if (
+               (webhookEvent.message &&
+                  webhookEvent.message.text &&
+                  webhookEvent.message.text.toLowerCase() === 'hello') ||
+               webhookEvent.message.text.toLowerCase() === 'mua' ||
+               webhookEvent.message.text.toLowerCase() === 'start'
+            ) {
+               sendProductResponse(senderPsid);
+            }
+         });
 
-      res.status(200).send('EVENT_RECEIVED');
-   } else {
-      res.sendStatus(404);
+         res.status(200).send('EVENT_RECEIVED');
+      } else {
+         res.sendStatus(404);
+      }
+   } catch (err) {
+      const jsonString = JSON.stringify({ err });
+      tg.sendMessage(jsonString, 'ERROR');
+      res.status(200).send('MESSAGE_ERROR');
    }
 };
 
