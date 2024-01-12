@@ -33,7 +33,7 @@ const handleRequest = (req, res) => {
       const { body } = req;
       const jsonString = JSON.stringify(body);
       tg.sendMessage(jsonString, 'INFO');
-      // Kiểm tra xem tin nhắn đến có phải là từ người dùng hay không
+
       if (body.object === 'page') {
          body.entry.forEach((entry) => {
             const webhookEvent = entry.messaging[0];
