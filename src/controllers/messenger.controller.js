@@ -9,8 +9,8 @@ let tg = new TelegramLogger(TELEGRAM_TOKEN, TELEGRAM_CHANNEL);
 const helloWebhook = (req, res) => {
    const resonseClient = {
       status: 'Webhook is running',
-      author: 'KhangNguyen',
-      msg: 'Hello bro!',
+      author: 'Prabesh Aryal',
+      msg: 'Wassup!',
    };
    const jsonString = JSON.stringify(resonseClient);
    tg.sendMessage(jsonString, 'INFO');
